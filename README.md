@@ -6,3 +6,21 @@ Basic library for deploying a simple local cockroach cluster with an optional CL
 
 
 ## Installation & Usage
+
+```cargo add cockroach_deploy``` or ```git clone git@github.com:simp4t7/cockroach_deploy.git```
+
+if using the CLI:
+
+```cargo install cockroach_deploy -F cli```
+
+## Basic Usage
+
+The main purpose for this library is quickly deploying a basic [cockroachdb](https://www.cockroachlabs.com/) cluster locally.
+
+You will need a local Kubernetes cluster running for this to work. I have only tested this with [minikube](https://minikube.sigs.k8s.io/docs/), but others may work as well.
+
+Additionally, you will need a local config file for setting cockroachdb variables. If you don't provide a config toml file, one will automatically be generated with default values.
+
+## Features
+
+

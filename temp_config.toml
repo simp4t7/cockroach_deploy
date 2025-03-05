@@ -1,0 +1,8 @@
+namespace = "temp_config"
+primary_port = 26257
+secondary_port = 8080
+sql_setup = "create table if not exists test;"
+replicas = 3
+cpus = "4"
+memory = "8Gi"
+storage = "50Gi"

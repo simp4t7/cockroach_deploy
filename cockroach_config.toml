@@ -1,0 +1,8 @@
+namespace = "test"
+primary_port = 26257
+secondary_port = 8080
+database_names = ["log_db", "program_db"]
+replicas = 3
+cpus = "4"
+memory = "8Gi"
+storage = "50Gi"
