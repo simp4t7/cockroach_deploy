@@ -1,6 +1,6 @@
 [package]
 name = "cockroach_deploy"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "Rust lib for a basic local cockroachdb deployment with optional CLI"
 license = "MIT OR Apache-2.0"
