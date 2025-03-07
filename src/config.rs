@@ -1,5 +1,4 @@
 use anyhow::Result;
-#[cfg(feature = "cli")]
 use clap::Args;
 use log::info;
 use scopeguard::defer;
@@ -10,8 +9,7 @@ use tokio::sync::watch::{Receiver, channel};
 use toml_config_trait::TomlConfig;
 use toml_config_trait::TomlConfigTrait;
 
-#[derive(TomlConfig, Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "cli", derive(Args))]
+#[derive(TomlConfig, Serialize, Deserialize, Debug, Clone, Args)]
 ///This is the crux of the crate and where all of the details of the deployment are defined and
 ///stored.
 pub struct CockroachConfig {

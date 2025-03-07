@@ -14,7 +14,7 @@ Additionally, you will need a local config file for setting cockroachdb variable
 
 if using the CLI:
 
-```cargo install cockroach_deploy -F cli```
+```cargo install cockroach_deploy```
 
 usage:
 

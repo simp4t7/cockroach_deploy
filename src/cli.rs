@@ -1,8 +1,8 @@
-use crate::config::CockroachConfig;
 use anyhow::Result;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
+use cockroach_deploy::config::CockroachConfig;
 use log::info;
 use std::time::Instant;
 
@@ -14,6 +14,8 @@ struct Cli {
     command: Commands,
     #[arg(short, long, default_value = "cockroach_config.toml")]
     config_path: Option<String>,
+    #[arg(short, long)]
+    level: Option<log::Level>,
 }
 
 #[derive(Subcommand)]
@@ -33,6 +35,11 @@ async fn main() -> Result<()> {
     let now = Instant::now();
     simple_logger::init_with_level(log::Level::Info)?;
     let cli = Cli::parse();
+    if let Some(level) = cli.level {
+        simple_logger::init_with_level(level)?;
+    } else {
+        simple_logger::init_with_level(log::Level::Info)?;
+    }
 
     //.unwrap() turns into default, so no panic.
     let config_path = cli.config_path.unwrap();
