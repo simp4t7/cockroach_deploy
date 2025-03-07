@@ -17,19 +17,24 @@ features = ["postgres"]
 
 [dependencies.log]
 version = "0.4.26"
-optional = false
+#optional = false
 
 [dependencies.simple_logger]
 version = "5.0.0"
-optional = true
+#optional = true
 
-[features]
-cli = ["clap/derive", "dep:simple_logger"]
+#[features]
+#cli = ["clap/derive", "dep:simple_logger"]
 
 [[bin]]
 name = "cockroach_deploy_cli"
 path = "src/cli/cli.rs"
-required-features = ["cli"]
+#required-features = ["cli"]
+
+[lib]
+name = "cockroach_deploy"
+path = "src/lib.rs"
+#required-features = ["cli"]
 
 [dependencies.toml_config_trait]
 version = "0.1.5"
@@ -47,7 +52,8 @@ features = ["rt-multi-thread", "macros", "sync"]
 
 [dependencies.clap]
 version = "4.5.31"
-optional = true
+features = ["derive"]
+#optional = true
 
 [dependencies.k8s-openapi]
 version = "0.24.0"

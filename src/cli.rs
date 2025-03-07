@@ -1,10 +1,9 @@
+use crate::config::CockroachConfig;
 use anyhow::Result;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
-use cockroach_deploy::config::CockroachConfig;
 use log::info;
-use simple_logger::SimpleLogger;
 use std::time::Instant;
 
 #[derive(Parser)]
@@ -32,7 +31,7 @@ enum CockroachCommand {
 #[tokio::main]
 async fn main() -> Result<()> {
     let now = Instant::now();
-    SimpleLogger::new().init()?;
+    simple_logger::init_with_level(log::Level::Info)?;
     let cli = Cli::parse();
 
     //.unwrap() turns into default, so no panic.
