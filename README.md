@@ -16,7 +16,9 @@ if using the CLI:
 
 ```cargo install cockroach_deploy -F cli```
 
-```cockroach_deploy --help```
+usage:
+
+```cockroach_deploy_cli --help```
 
 if using the library:
 

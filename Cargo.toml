@@ -8,8 +8,6 @@ documentation = "https://docs.rs/cockroach_deploy"
 repository = "https://github.com/simp4t7/cockroach_deploy"
 readme = "README.md"
 
-[dependencies]
-
 [dependencies.scopeguard]
 version = "1.2.0"
 
@@ -27,10 +25,6 @@ optional = true
 
 [features]
 cli = ["clap/derive", "dep:simple_logger"]
-
-#[lib]
-#name = "cockroach_deploy"
-#path = "src/lib.rs"
 
 [[bin]]
 name = "cockroach_deploy_cli"
