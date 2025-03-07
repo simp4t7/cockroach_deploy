@@ -1,5 +1,5 @@
 use crate::config::CockroachConfig;
-use crate::utils::get_kube_client;
+use crate::utils::init_namespace;
 use anyhow::Result;
 use k8s_openapi::api::apps::v1::StatefulSet;
 use k8s_openapi::api::batch::v1::Job;
@@ -10,46 +10,14 @@ use kube::api::{DeleteParams, ListParams, PostParams, PropagationPolicy};
 use kube::runtime::wait::{await_condition, conditions};
 use kube::{Api, ResourceExt};
 use log::info;
-use std::fs;
-use toml_config_trait::TomlConfigTrait;
 
-/// This function creates all of the services / stateful sets / deployments / and jobs necessary to
-/// start a cockroachdb cluster.
-
-#[derive(Clone)]
-pub struct CockroachResources {
-    pub first_service: Service,
-    pub second_service: Service,
-    pub pod_disruption_budget: PodDisruptionBudget,
-    pub stateful_set: StatefulSet,
-    pub cluster_init: Job,
-    pub make_db: Job,
-    pub config: CockroachConfig,
-}
-
-impl CockroachResources {
-    pub fn new(config_path: &str) -> Result<Self> {
-        if !fs::exists(&config_path)? {
-            CockroachConfig::default().write_to_path(config_path.into())?;
-        }
-        let config = CockroachConfig::read_from_path(config_path.into())?;
-        Ok(Self {
-            first_service: config.cockroach_first_service(),
-            second_service: config.cockroach_second_service(),
-            pod_disruption_budget: CockroachConfig::cockroach_pod_disruption_budget(),
-            stateful_set: config.cockroach_stateful_set(),
-            cluster_init: CockroachConfig::cockroach_cluster_init(),
-            make_db: config.cockroach_make_db(),
-            config,
-        })
-    }
-
-    /// This function deletes all of the services / stateful sets / deployments / and jobs necessary to
+impl CockroachConfig {
+    /// This method deletes all of the services / stateful sets / deployments / and jobs necessary to
     /// completely eradicate a cockroachdb cluster, N U C L E A R
-
     pub async fn delete_cockroach(&self) -> Result<()> {
-        let client = get_kube_client(&self.config.namespace).await;
-        let jobs: Api<Job> = Api::namespaced(client.clone(), &self.config.namespace);
+        let client = init_namespace(&self.namespace).await?;
+
+        let jobs: Api<Job> = Api::namespaced(client.clone(), &self.namespace);
         let lp = ListParams::default().labels("app=cockroachdb");
         let dp = DeleteParams {
             propagation_policy: Some(PropagationPolicy::Foreground),
@@ -114,32 +82,34 @@ impl CockroachResources {
         Ok(())
     }
 
+    /// This method creates all of the services / stateful sets / deployments / and jobs necessary to
+    /// start a cockroachdb cluster.
     pub async fn init_cockroach(&self) -> Result<()> {
-        let client = get_kube_client(&self.config.namespace).await;
-        let services: Api<Service> = Api::namespaced(client.clone(), &self.config.namespace);
+        let client = init_namespace(&self.namespace).await?;
+        let services: Api<Service> = Api::namespaced(client.clone(), &self.namespace);
         let pp = PostParams::default();
-        let first_service_yaml = &self.first_service;
+        let first_service_yaml = &self.cockroach_first_service();
         let create_result = services.create(&pp, &first_service_yaml).await;
         match create_result {
             Ok(_) => info!("create cockroach_first_service successful"),
             Err(e) => return Err(e.into()),
         }
 
-        let second_service_yaml = &self.second_service;
+        let second_service_yaml = &self.cockroach_second_service();
         let create_result = services.create(&pp, &second_service_yaml).await;
         match create_result {
             Ok(_) => info!("create cockroach_second_service successful"),
             Err(e) => return Err(e.into()),
         }
         let budget: Api<PodDisruptionBudget> = Api::default_namespaced(client.clone());
-        let budget_yaml = &self.pod_disruption_budget;
+        let budget_yaml = &CockroachConfig::cockroach_pod_disruption_budget();
         let create_result = budget.create(&pp, &budget_yaml).await;
         match create_result {
             Ok(_) => info!("create cockroach_pod_disruption successful"),
             Err(e) => return Err(e.into()),
         }
         let stateset: Api<StatefulSet> = Api::default_namespaced(client.clone());
-        let stateset_yaml = &self.stateful_set;
+        let stateset_yaml = &self.cockroach_stateful_set();
         let create_result = stateset.create(&pp, &stateset_yaml).await;
         match create_result {
             Ok(_) => info!("create cockroach_stateful_set successful"),
@@ -147,7 +117,7 @@ impl CockroachResources {
         }
 
         let job: Api<Job> = Api::default_namespaced(client.clone());
-        let cluster_init_yaml = &self.cluster_init;
+        let cluster_init_yaml = &CockroachConfig::cockroach_cluster_init();
         let create_result = job.create(&pp, &cluster_init_yaml).await;
         match create_result {
             Ok(_) => info!("create cockroach_cluster_init successful"),
@@ -163,7 +133,7 @@ impl CockroachResources {
         )
         .await?;
 
-        let make_db_yaml = &self.make_db;
+        let make_db_yaml = &self.cockroach_make_db();
         let create_result = job.create(&pp, &make_db_yaml).await;
         match create_result {
             Ok(_) => info!("create cockroach_make_db successful"),

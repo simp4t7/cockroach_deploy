@@ -2,12 +2,10 @@ use anyhow::Result;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
-use cockroach_deploy::cockroach::CockroachResources;
+use cockroach_deploy::config::CockroachConfig;
 use log::info;
-use scopeguard::defer;
 use simple_logger::SimpleLogger;
 use std::time::Instant;
-use tokio::sync::watch::channel;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -28,7 +26,6 @@ enum Commands {
 enum CockroachCommand {
     Nuke,
     Init,
-    Test,
     Clear,
 }
 
@@ -37,10 +34,12 @@ async fn main() -> Result<()> {
     let now = Instant::now();
     SimpleLogger::new().init()?;
     let cli = Cli::parse();
+
+    //.unwrap() turns into default, so no panic.
     let config_path = cli.config_path.unwrap();
 
-    let cockroach = CockroachResources::new(&config_path)?;
-    info!("config: {:#?}", &cockroach.config);
+    let cockroach = CockroachConfig::new_from_path(&config_path)?;
+    info!("config: {:#?}", &cockroach);
     match &cli.command {
         Commands::Cockroach { command } => match command {
             CockroachCommand::Init => {
@@ -52,19 +51,9 @@ async fn main() -> Result<()> {
                 info!("total time to cockroach nuke: {:#?}", &now.elapsed());
             }
             CockroachCommand::Clear => {
-                let (tx, rx) = channel(false);
-                let c = cockroach.clone();
-                tokio::task::spawn(async move {
-                    c.cockroach_port_forward(rx)
-                        .await
-                        .expect("cockroach_port_forward error");
-                });
-
-                defer!(tx.send(true).expect("send err"););
-                cockroach.refresh_database().await?;
+                cockroach.clear_database().await?;
                 info!("total time to cockroach clear: {:#?}", &now.elapsed());
             }
-            CockroachCommand::Test => {}
         },
     }
     Ok(())

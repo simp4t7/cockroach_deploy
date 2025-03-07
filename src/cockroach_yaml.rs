@@ -18,8 +18,8 @@ use kube::api::ObjectMeta;
 use crate::config::CockroachConfig;
 
 impl CockroachConfig {
-    /// This function creates a cockroachdb service, part of the statefulset yaml.
-    /// https://github.com/cockroachdb/cockroach/blob/master/cloud/kubernetes/cockroachdb-statefulset.yaml
+    // This function creates a cockroachdb service, part of the statefulset yaml.
+    // https://github.com/cockroachdb/cockroach/blob/master/cloud/kubernetes/cockroachdb-statefulset.yaml
     pub(crate) fn cockroach_first_service(&self) -> Service {
         Service {
             metadata: ObjectMeta {
@@ -55,7 +55,7 @@ impl CockroachConfig {
         }
     }
 
-    /// This function also creates a cockroachdb service, part of the statefulset yaml.
+    // This function also creates a cockroachdb service, part of the statefulset yaml.
     pub(crate) fn cockroach_second_service(&self) -> Service {
         Service {
             metadata: ObjectMeta {
@@ -107,7 +107,7 @@ impl CockroachConfig {
         }
     }
 
-    /// This function also creates the cockroachdb pod disruption budget, part of the statefulset yaml.
+    // This function also creates the cockroachdb pod disruption budget, part of the statefulset yaml.
     pub(crate) fn cockroach_pod_disruption_budget() -> PodDisruptionBudget {
         PodDisruptionBudget {
             metadata: ObjectMeta {
@@ -133,7 +133,7 @@ impl CockroachConfig {
         }
     }
 
-    /// This function also creates the cockroachdb statefulset, part of the statefulset yaml.
+    // This function also creates the cockroachdb statefulset, part of the statefulset yaml.
     pub(crate) fn cockroach_stateful_set(&self) -> StatefulSet {
         StatefulSet {
             metadata: ObjectMeta {
@@ -315,7 +315,7 @@ impl CockroachConfig {
         }
     }
 
-    /// This function creates the cockroachdb cluster init job, part of the cluster-init yaml.
+    // This function creates the cockroachdb cluster init job, part of the cluster-init yaml.
     pub(crate) fn cockroach_cluster_init() -> Job {
         Job {
             metadata: ObjectMeta {
@@ -352,8 +352,7 @@ impl CockroachConfig {
         }
     }
 
-    /// This is a custom job that creates `log_db` and `program_db` after cockroachdb has initialized.
-
+    // This is a custom job that creates `log_db` and `program_db` after cockroachdb has initialized.
     pub(crate) fn cockroach_make_db(&self) -> Job {
         Job {
             metadata: ObjectMeta {
