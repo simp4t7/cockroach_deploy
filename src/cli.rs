@@ -33,7 +33,6 @@ enum CockroachCommand {
 #[tokio::main]
 async fn main() -> Result<()> {
     let now = Instant::now();
-    simple_logger::init_with_level(log::Level::Info)?;
     let cli = Cli::parse();
     if let Some(level) = cli.level {
         simple_logger::init_with_level(level)?;
