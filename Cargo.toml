@@ -25,7 +25,7 @@ version = "1.0"
 features = ["derive"]
 
 [dependencies.tokio]
-version = "1.43.0"
+version = "1.43.1"
 features = ["rt-multi-thread", "macros", "sync"]
 
 [dependencies.clap]
